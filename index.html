@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human 3.0 自我探索測評</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-light: #a78bfa;
+      --primary-dark: #5b21b6;
+      --accent: #06b6d4;
+      --bg: #09090b;
+      --bg-card: #18181b;
+      --bg-card2: #27272a;
+      --text: #fafafa;
+      --text-muted: #a1a1aa;
+      --border: #3f3f46;
+      --mind: #8b5cf6;
+      --body-q: #10b981;
+      --spirit: #f59e0b;
+      --vocation: #3b82f6;
+      --lifestyle: #ec4899;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang HK', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(9,9,11,0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.875rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--primary-light), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .api-status-pill {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--bg-card); border: 1px solid var(--border);
+      padding: 0.375rem 0.875rem; border-radius: 2rem; font-size: 0.8125rem;
+    }
+    .api-dot { width: 8px; height: 8px; border-radius: 50%; transition: background 0.3s; }
+    .api-dot.on { background: var(--success); box-shadow: 0 0 6px var(--success); }
+    .api-dot.off { background: var(--text-muted); }
+    .btn-settings {
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text); padding: 0.5rem 1rem; border-radius: 0.5rem;
+      cursor: pointer; font-size: 0.875rem; font-family: inherit;
+      display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;
+    }
+    .btn-settings:hover { border-color: var(--primary-light); background: var(--bg-card2); }
+
+    /* ── SCREENS ── */
+    main { padding-top: 4rem; }
+    .screen { display: none; min-height: calc(100vh - 4rem); }
+    .screen.active { display: block; }
+
+    /* ── WELCOME ── */
+    #screenWelcome {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      padding: 4rem 1.5rem 3rem;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.2) 0%, transparent 70%);
+    }
+    #screenWelcome.active { display: flex; }
+    .welcome-badge {
+      background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35);
+      color: var(--primary-light); padding: 0.3rem 0.875rem; border-radius: 2rem;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .welcome-title {
+      font-size: clamp(2.5rem, 7vw, 4.5rem); font-weight: 900; line-height: 1.05;
+      text-align: center; margin-bottom: 1rem;
+      background: linear-gradient(160deg, #ffffff 0%, var(--primary-light) 60%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .welcome-sub {
+      font-size: 1.0625rem; color: var(--text-muted); text-align: center;
+      max-width: 560px; margin: 0 auto 2.5rem; line-height: 1.75;
+    }
+    .quadrant-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1rem; max-width: 860px; width: 100%; margin-bottom: 2.5rem;
+    }
+    @media(max-width:700px){ .quadrant-grid { grid-template-columns: repeat(2,1fr); } }
+    .q-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem;
+      padding: 1.25rem; transition: border-color 0.2s, transform 0.2s;
+    }
+    .q-card:hover { border-color: var(--primary-light); transform: translateY(-2px); }
+    .q-card-icon { font-size: 1.75rem; margin-bottom: 0.625rem; }
+    .q-card h3 { font-size: 0.9375rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .q-card p { font-size: 0.8125rem; color: var(--text-muted); line-height: 1.5; }
+    .welcome-btns { display: flex; gap: 0.875rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #6d28d9);
+      color: white; border: none; padding: 0.875rem 2.25rem; border-radius: 0.75rem;
+      font-size: 1rem; font-weight: 600; cursor: pointer; font-family: inherit;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.35); transition: all 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.45); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      background: var(--bg-card); color: var(--text); border: 1px solid var(--border);
+      padding: 0.875rem 1.75rem; border-radius: 0.75rem; font-size: 1rem;
+      font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--primary-light); background: var(--bg-card2); }
+    .welcome-meta {
+      display: flex; gap: 1.75rem; flex-wrap: wrap; justify-content: center;
+      color: var(--text-muted); font-size: 0.8125rem;
+    }
+    .welcome-meta span { display: flex; align-items: center; gap: 0.35rem; }
+
+    /* ── QUIZ ── */
+    #screenQuiz { padding: 2rem 1.5rem 4rem; max-width: 780px; margin: 0 auto; }
+
+    .progress-wrapper { margin-bottom: 2rem; }
+    .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.625rem; }
+    .progress-label { font-size: 0.875rem; color: var(--text-muted); }
+    .progress-count { font-size: 0.875rem; font-weight: 700; color: var(--primary-light); }
+    .progress-track { height: 5px; background: var(--bg-card2); border-radius: 3px; overflow: hidden; }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 3px; transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    }
+
+    .step-tabs {
+      display: flex; gap: 0.5rem; margin-top: 1rem; overflow-x: auto;
+      padding-bottom: 0.25rem; scrollbar-width: none;
+    }
+    .step-tabs::-webkit-scrollbar { display: none; }
+    .step-tab {
+      flex-shrink: 0; padding: 0.4rem 0.875rem; border-radius: 2rem;
+      font-size: 0.8rem; font-weight: 500; border: 1px solid var(--border);
+      color: var(--text-muted); background: transparent; cursor: default; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .step-tab.active { background: rgba(124,58,237,0.15); border-color: var(--primary); color: var(--primary-light); }
+    .step-tab.done { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.3); color: var(--success); }
+
+    .section-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 1.25rem; padding: 1.75rem; margin-bottom: 1.25rem;
+      animation: fadeUp 0.35s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .section-hd {
+      display: flex; align-items: flex-start; gap: 0.875rem;
+      padding-bottom: 1.25rem; margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-stripe { width: 4px; min-height: 40px; border-radius: 2px; flex-shrink: 0; margin-top: 2px; }
+    .section-hd h2 { font-size: 1.0625rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .section-hd p { font-size: 0.8125rem; color: var(--text-muted); }
+
+    .q-item { margin-bottom: 1.5rem; }
+    .q-item:last-child { margin-bottom: 0; }
+    .q-label { display: block; font-size: 0.9375rem; font-weight: 600; margin-bottom: 0.375rem; line-height: 1.55; }
+    .q-hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; font-style: italic; }
+    textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 0.625rem; padding: 0.75rem 1rem; color: var(--text);
+      font-size: 0.9375rem; font-family: inherit; resize: vertical;
+      min-height: 90px; transition: border-color 0.2s; line-height: 1.65;
+    }
+    textarea:focus { outline: none; border-color: var(--primary); }
+    textarea::placeholder { color: #52525b; }
+
+    .extra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
+    @media(max-width:500px){ .extra-grid { grid-template-columns: 1fr; } }
+    .fg { display: flex; flex-direction: column; gap: 0.4rem; }
+    .fg label { font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); }
+    .fg input, .fg select {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 0.5rem;
+      padding: 0.625rem 0.875rem; color: var(--text); font-size: 0.9375rem;
+      font-family: inherit; transition: border-color 0.2s;
+    }
+    .fg input:focus, .fg select:focus { outline: none; border-color: var(--primary); }
+    .fg select option { background: var(--bg-card); }
+
+    .quiz-nav {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;
+    }
+
+    /* ── ANALYSIS ── */
+    #screenAnalysis {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      min-height: calc(100vh - 4rem); padding: 2rem; text-align: center;
+    }
+    #screenAnalysis.active { display: flex; }
+    .spinner {
+      width: 60px; height: 60px;
+      border: 3px solid var(--bg-card2); border-top-color: var(--primary);
+      border-radius: 50%; animation: spin 0.75s linear infinite; margin-bottom: 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .analysis-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .analysis-sub { color: var(--text-muted); margin-bottom: 2rem; }
+    .analysis-steps {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 1.5rem; text-align: left; min-width: 300px; max-width: 400px;
+    }
+    .a-step { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.875rem; font-size: 0.9375rem; }
+    .a-step:last-child { margin-bottom: 0; }
+    .a-icon {
+      width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;
+      transition: all 0.3s;
+    }
+    .a-icon.wait { background: var(--bg-card2); color: var(--text-muted); }
+    .a-icon.run { background: rgba(124,58,237,0.25); color: var(--primary-light); animation: pulse 1.2s ease-in-out infinite; }
+    .a-icon.done { background: rgba(34,197,94,0.15); color: var(--success); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── REPORT ── */
+    #screenReport { padding: 2rem 1.5rem 5rem; max-width: 880px; margin: 0 auto; }
+
+    .report-hero {
+      text-align: center; padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(6,182,212,0.08));
+      border: 1px solid rgba(124,58,237,0.25); border-radius: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .report-eyebrow {
+      display: inline-block; background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4);
+      color: var(--primary-light); padding: 0.25rem 0.75rem; border-radius: 2rem;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .report-metatype {
+      font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 900; line-height: 1.1;
+      background: linear-gradient(135deg, #fff, var(--primary-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 0.875rem;
+    }
+    .report-tagline { color: var(--text-muted); font-size: 1rem; max-width: 560px; margin: 0 auto 1.5rem; }
+    .report-actions { display: flex; gap: 0.875rem; justify-content: center; flex-wrap: wrap; }
+    .btn-outline {
+      background: transparent; border: 1px solid var(--border); color: var(--text);
+      padding: 0.625rem 1.25rem; border-radius: 0.625rem; font-size: 0.9rem;
+      font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--primary-light); color: var(--primary-light); }
+
+    .report-body {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 1.25rem; padding: 2rem;
+    }
+    .report-body h1 { font-size: 1.5rem; font-weight: 800; margin: 1.5rem 0 0.75rem; color: var(--primary-light); }
+    .report-body h2 {
+      font-size: 1.1875rem; font-weight: 700; margin: 1.75rem 0 0.625rem; color: var(--text);
+      padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+    }
+    .report-body h3 { font-size: 1rem; font-weight: 700; margin: 1.25rem 0 0.5rem; color: var(--accent); }
+    .report-body h4 { font-size: 0.9375rem; font-weight: 600; margin: 1rem 0 0.375rem; color: var(--text-muted); }
+    .report-body p { color: #d4d4d8; margin-bottom: 0.75rem; line-height: 1.75; }
+    .report-body ul, .report-body ol { padding-left: 1.5rem; color: #d4d4d8; margin-bottom: 0.75rem; }
+    .report-body li { margin-bottom: 0.375rem; line-height: 1.65; }
+    .report-body strong { color: var(--text); }
+    .report-body em { color: var(--primary-light); font-style: normal; }
+    .report-body blockquote {
+      border-left: 3px solid var(--primary); padding-left: 1rem;
+      color: var(--text-muted); margin: 1rem 0; font-style: italic;
+    }
+    .report-body code {
+      background: var(--bg-card2); padding: 0.15em 0.4em;
+      border-radius: 0.3rem; font-size: 0.875em; color: var(--accent);
+    }
+    .report-body hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+    /* ── EXPORT ── */
+    #screenExport { padding: 2rem 1.5rem 4rem; max-width: 780px; margin: 0 auto; }
+    .export-hd { margin-bottom: 1.5rem; }
+    .export-hd h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .export-hd p { color: var(--text-muted); }
+
+    .export-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 1.25rem; padding: 1.75rem; margin-bottom: 1.25rem;
+    }
+    .export-card h3 { font-size: 1.0625rem; font-weight: 700; margin-bottom: 0.375rem; }
+    .export-card > p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem; }
+    .prompt-box {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 0.75rem;
+      padding: 1.25rem; font-family: 'SF Mono','Fira Code',monospace; font-size: 0.8125rem;
+      line-height: 1.7; white-space: pre-wrap; max-height: 360px; overflow-y: auto;
+      color: #a1a1aa; margin-bottom: 1rem;
+    }
+    .export-btns { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    .tip-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .tip-item { display: flex; align-items: flex-start; gap: 0.75rem; color: var(--text-muted); font-size: 0.9rem; }
+    .tip-num {
+      width: 24px; height: 24px; background: rgba(124,58,237,0.15); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: var(--primary-light); flex-shrink: 0; margin-top: 1px;
+    }
+    .tip-item a { color: var(--primary-light); text-decoration: none; }
+    .tip-item a:hover { text-decoration: underline; }
+    .tip-item code {
+      background: var(--bg-card2); padding: 0.2em 0.45em; border-radius: 0.3rem;
+      font-size: 0.825em; color: var(--accent);
+    }
+
+    /* ── SETTINGS MODAL ── */
+    .overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 1.5rem; padding: 2rem; max-width: 540px; width: 100%;
+      position: relative; max-height: 90vh; overflow-y: auto;
+    }
+    .modal-close {
+      position: absolute; top: 1.25rem; right: 1.25rem;
+      background: var(--bg-card2); border: none; color: var(--text-muted);
+      width: 32px; height: 32px; border-radius: 0.5rem;
+      cursor: pointer; font-size: 1.125rem; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .modal-close:hover { background: var(--border); color: var(--text); }
+    .modal h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .modal > p { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.75rem; }
+
+    .model-label { font-size: 0.8125rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.625rem; display: block; }
+    .model-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .model-opt {
+      display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1rem;
+      background: var(--bg); border: 2px solid var(--border); border-radius: 0.875rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .model-opt:hover { border-color: rgba(124,58,237,0.5); }
+    .model-opt.sel { border-color: var(--primary); background: rgba(124,58,237,0.07); }
+    .model-opt input[type=radio] { display: none; }
+    .radio-dot {
+      width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .model-opt.sel .radio-dot { border-color: var(--primary); background: var(--primary); }
+    .model-opt.sel .radio-dot::after { content:''; width:6px; height:6px; border-radius:50%; background:white; }
+    .model-info { flex: 1; }
+    .model-nm { font-size: 0.9375rem; font-weight: 600; }
+    .model-sid { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; margin-top: 1px; }
+    .model-tag {
+      padding: 0.2rem 0.5rem; border-radius: 0.3rem; font-size: 0.6875rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0;
+    }
+    .tag-or { background: rgba(124,58,237,0.12); color: var(--primary-light); }
+    .tag-gl { background: rgba(59,130,246,0.12); color: #60a5fa; }
+
+    .key-wrap { margin-bottom: 1.5rem; }
+    .key-wrap label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .key-field { position: relative; }
+    .key-input {
+      width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 0.625rem;
+      padding: 0.6875rem 2.75rem 0.6875rem 1rem; color: var(--text);
+      font-size: 0.9rem; font-family: monospace; transition: border-color 0.2s;
+    }
+    .key-input:focus { outline: none; border-color: var(--primary); }
+    .key-toggle {
+      position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem; padding: 0;
+    }
+    .key-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.375rem; }
+    .key-hint a { color: var(--primary-light); text-decoration: none; }
+    .key-hint a:hover { text-decoration: underline; }
+
+    .modal-footer { display: flex; gap: 0.75rem; justify-content: flex-end; }
+    .btn-sm { padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 0.9375rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .btn-save { background: var(--primary); color: white; border: none; }
+    .btn-save:hover { background: var(--primary-dark); }
+    .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-cancel:hover { border-color: var(--text-muted); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 400;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.875rem;
+      padding: 0.875rem 1.25rem; font-size: 0.9rem; max-width: 320px;
+      transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(34,197,94,0.4); }
+    .toast.error { border-color: rgba(239,68,68,0.4); }
+
+    /* ── UTILS ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════════════════════════ -->
+<header>
+  <div class="logo">HUMAN 3.0</div>
+  <div class="header-right">
+    <div class="api-status-pill">
+      <div class="api-dot off" id="apiDot"></div>
+      <span id="apiStatusTxt">未設定 AI</span>
+    </div>
+    <button class="btn-settings" onclick="openSettings()">⚙️ 設定</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     WELCOME SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screenWelcome">
+  <div class="welcome-badge">Dan Koe · Human 3.0 Framework</div>
+  <h1 class="welcome-title">自我探索<br>測評系統</h1>
+  <p class="welcome-sub">
+    透過四個生命維度的深度問答，AI 將為你找出發展層次、<br>
+    Metatype 原型，並提供個人化的成長策略。
+  </p>
+  <div class="quadrant-grid">
+    <div class="q-card">
+      <div class="q-card-icon">🧠</div>
+      <h3>心智 Mind</h3>
+      <p>內在世界、信念體系、思維模式與後設認知能力</p>
+    </div>
+    <div class="q-card">
+      <div class="q-card-icon">💪</div>
+      <h3>身體 Body</h3>
+      <p>外在行為、健康習慣、身體能量與物理表現</p>
+    </div>
+    <div class="q-card">
+      <div class="q-card-icon">✨</div>
+      <h3>靈性 Spirit</h3>
+      <p>關係連結、人生意義、社群歸屬與超越感</p>
+    </div>
+    <div class="q-card">
+      <div class="q-card-icon">🚀</div>
+      <h3>職志 Vocation</h3>
+      <p>事業發展、價值創造、社會貢獻與人生使命</p>
+    </div>
+  </div>
+  <div class="welcome-btns">
+    <button class="btn-primary" onclick="startQuiz()">開始測評 →</button>
+    <button class="btn-secondary" onclick="openSettings()">⚙️ 設定 AI 模型</button>
+  </div>
+  <div class="welcome-meta">
+    <span>📝 約 20 分鐘</span>
+    <span>🔒 資料僅在本地處理</span>
+    <span>🤖 支援直接 AI 分析或匯出 Prompt</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     QUIZ SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenQuiz">
+  <!-- Progress -->
+  <div class="progress-wrapper">
+    <div class="progress-top">
+      <span class="progress-label" id="progLabel">心智象限 · 第 1 節</span>
+      <span class="progress-count" id="progCount">0 / 19</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progFill" style="width:0%"></div>
+    </div>
+    <div class="step-tabs" id="stepTabs"></div>
+  </div>
+
+  <!-- Content -->
+  <div id="quizContent"></div>
+
+  <!-- Nav -->
+  <div class="quiz-nav">
+    <button class="btn-secondary" id="btnBack" onclick="prevStep()" style="display:none;">← 上一步</button>
+    <div></div>
+    <button class="btn-primary" id="btnNext" onclick="nextStep()">繼續 →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ANALYSIS SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenAnalysis">
+  <div class="spinner"></div>
+  <h2 class="analysis-title">正在分析您的回應</h2>
+  <p class="analysis-sub" id="analysisSub">AI 正在深度解讀您的四個象限……</p>
+  <div class="analysis-steps">
+    <div class="a-step"><div class="a-icon run" id="as1">●</div><span>整合四個象限的答案</span></div>
+    <div class="a-step"><div class="a-icon wait" id="as2">2</div><span>識別發展層次與 Metatype</span></div>
+    <div class="a-step"><div class="a-icon wait" id="as3">3</div><span>分析跨象限互動動態</span></div>
+    <div class="a-step"><div class="a-icon wait" id="as4">4</div><span>制定個人化成長策略</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     REPORT SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenReport">
+  <div class="report-hero">
+    <div class="report-eyebrow">Human 3.0 · 評估報告</div>
+    <h1 class="report-metatype" id="rMetatype">您的 Metatype</h1>
+    <p class="report-tagline" id="rTagline">基於四象限深度分析，以下是您的個人化成長報告</p>
+    <div class="report-actions">
+      <button class="btn-primary" onclick="downloadReport()">📄 下載 HTML 報告</button>
+      <button class="btn-outline" onclick="showExport()">📋 匯出 Prompt</button>
+      <button class="btn-outline" onclick="resetAll()">🔄 重新測評</button>
+    </div>
+  </div>
+  <div class="report-body" id="reportBody"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EXPORT SCREEN
+════════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screenExport">
+  <div class="export-hd">
+    <button class="btn-secondary" onclick="goBackFromExport()" style="margin-bottom:1rem;font-size:0.875rem;padding:0.5rem 1rem;">← 返回</button>
+    <h2>📋 匯出分析 Prompt</h2>
+    <p>複製以下 Prompt，貼入 Gemini、Claude 或其他 AI 進行分析。建議使用 Gemini Canvas 輸出精美 HTML 報告。</p>
+  </div>
+
+  <div class="export-card">
+    <h3>完整分析 Prompt</h3>
+    <p>此 Prompt 包含完整的 Human 3.0 知識庫及您的問卷答案，貼入 AI 即可生成個人評估報告。</p>
+    <div class="prompt-box" id="promptBox"></div>
+    <div class="export-btns">
+      <button class="btn-primary" onclick="copyPrompt()">📋 複製 Prompt</button>
+      <button class="btn-secondary" onclick="window.open('https://gemini.google.com','_blank')">🔮 開啟 Gemini</button>
+      <button class="btn-secondary" onclick="window.open('https://claude.ai','_blank')">🤖 開啟 Claude</button>
+    </div>
+  </div>
+
+  <div class="export-card">
+    <h3>💡 使用 Gemini Canvas 的步驟</h3>
+    <p>讓 Gemini 輸出一份精美的 HTML 報告，可下載並在瀏覽器中查看：</p>
+    <div class="tip-list">
+      <div class="tip-item">
+        <div class="tip-num">1</div>
+        <span>複製上方 Prompt，前往 <a href="https://gemini.google.com" target="_blank">gemini.google.com</a> 貼上</span>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">2</div>
+        <span>Gemini 完成分析後，在對話結尾追加：<code>"請用 Canvas 輸出一個美觀的繁體中文 HTML 報告"</code></span>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">3</div>
+        <span>Canvas 會生成 HTML 預覽，點擊右上角下載圖示即可儲存 .html 檔</span>
+      </div>
+      <div class="tip-item">
+        <div class="tip-num">4</div>
+        <span>用瀏覽器開啟下載的 HTML，即可查看精美的完整評估報告</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main><!-- /main -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SETTINGS MODAL
+════════════════════════════════════════════════════════════════ -->
+<div class="overlay" id="settingsOverlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSettings()">×</button>
+    <h2>⚙️ AI 設定</h2>
+    <p>選擇 AI 模型並輸入 API Key，即可在網站上直接進行分析。不設定也可匯出 Prompt 自行分析。</p>
+
+    <span class="model-label">選擇 AI 模型</span>
+    <div class="model-list" id="modelList"></div>
+
+    <div class="key-wrap">
+      <label id="keyLabel">OpenRouter API Key</label>
+      <div class="key-field">
+        <input type="password" class="key-input" id="keyInput" placeholder="sk-or-v1-..." autocomplete="off">
+        <button class="key-toggle" onclick="toggleKey()">👁️</button>
+      </div>
+      <p class="key-hint" id="keyHint">前往 <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a> 取得 API Key</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-sm btn-cancel" onclick="closeSettings()">取消</button>
+      <button class="btn-sm btn-save" onclick="saveSettings()">儲存設定</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────────
+// DATA: Models
+// ──────────────────────────────────────────────
+const MODELS = [
+  {
+    name: 'Kimi K2.5',
+    icon: '🌙',
+    id: 'moonshotai/kimi-k2.5',
+    provider: 'openrouter',
+    tag: 'OpenRouter', tagClass: 'tag-or',
+    placeholder: 'sk-or-v1-...',
+    keyLabel: 'OpenRouter API Key',
+    keyHint: '前往 <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a> 取得 API Key'
+  },
+  {
+    name: 'MiniMax M2.5',
+    icon: '⚡',
+    id: 'minimax/minimax-m2.5',
+    provider: 'openrouter',
+    tag: 'OpenRouter', tagClass: 'tag-or',
+    placeholder: 'sk-or-v1-...',
+    keyLabel: 'OpenRouter API Key',
+    keyHint: '前往 <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a> 取得 API Key'
+  },
+  {
+    name: 'Gemini 3.1 Pro Preview',
+    icon: '🔮',
+    id: 'gemini-3.1-pro-preview',
+    provider: 'google',
+    tag: 'AI Studio', tagClass: 'tag-gl',
+    placeholder: 'AIza...',
+    keyLabel: 'Google AI Studio API Key',
+    keyHint: '前往 <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a> 取得 API Key'
+  },
+  {
+    name: 'Gemini 2.5 Pro',
+    icon: '💎',
+    id: 'gemini-2.5-pro',
+    provider: 'google',
+    tag: 'AI Studio', tagClass: 'tag-gl',
+    placeholder: 'AIza...',
+    keyLabel: 'Google AI Studio API Key',
+    keyHint: '前往 <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a> 取得 API Key'
+  }
+];
+
+// ──────────────────────────────────────────────
+// DATA: Quiz Steps
+// ──────────────────────────────────────────────
+const STEPS = [
+  {
+    id: 'mind', icon: '🧠', label: '心智象限',
+    desc: '你的內在世界、信念體系與思維模式',
+    color: '#8b5cf6',
+    questions: [
+      { id: 'mind_1', q: '當你遇到與你世界觀相矛盾的想法時，你的第一反應是什麼？', hint: '例如：感到抗拒、好奇、想反駁，還是開放探索？你通常怎麼處理認知衝突？' },
+      { id: 'mind_2', q: '你如何判斷什麼是真實或有價值的信息？你有哪些篩選標準？', hint: '例如：依賴權威、親身驗證、多角度比較，或直覺感受？' },
+      { id: 'mind_3', q: '描述你最近一次重大的信念改變——是什麼觸發了它？', hint: '如果長期沒有信念改變，為什麼你認為如此？' },
+      { id: 'mind_4', q: '你目前有什麼道理「懂了」但卻無法實踐？知行之間最大的落差在哪裡？', hint: '例如：知道要放下但做不到、知道要早睡但總是拖延。' }
+    ]
+  },
+  {
+    id: 'body', icon: '💪', label: '身體象限',
+    desc: '你的健康習慣、身體能量與外在行為',
+    color: '#10b981',
+    questions: [
+      { id: 'body_1', q: '描述你目前與自己身體的關係——它是你的盟友、敵人，還是只是工具？', hint: '你是否傾聽身體的信號？還是常常強迫或忽視它？' },
+      { id: 'body_2', q: '是什麼在驅動你的健康與健身決定——外表、表現，還是長期健康？', hint: '你的動力是來自外在（別人怎麼看你）還是內在（你自己的感受）？' },
+      { id: 'body_3', q: '當生活陷入混亂或高壓時，你的身體習慣有多穩定？', hint: '睡眠、飲食、運動——哪些最先被犧牲？你通常怎麼重新上軌道？' },
+      { id: 'body_4', q: '你知道應該做但一直沒有落實的身體習慣是什麼？阻礙你的真正原因是什麼？', hint: '例如：知道要規律運動但沒有；知道要戒糖但戒不了。背後的障礙是什麼？' }
+    ]
+  },
+  {
+    id: 'spirit', icon: '✨', label: '靈性象限',
+    desc: '你的人際連結、意義感與精神實踐',
+    color: '#f59e0b',
+    questions: [
+      { id: 'spi_1', q: '當生活感覺空洞或毫無意義時，你如何找回方向和意義感？', hint: '你是否有穩定的意義來源，還是常常需要向外尋找？' },
+      { id: 'spi_2', q: '描述你與社群、關係的連結——它是你生命的必需品、選項，還是不可或缺的核心？', hint: '你能在孤獨中感到完整嗎？還是需要與人連結才感到存在？' },
+      { id: 'spi_3', q: '你對「傳統、信仰、儀式」在生命中的角色有何看法？你有屬於自己的精神實踐嗎？', hint: '例如：冥想、祈禱、週期性反思、親近自然，或任何讓你感到連結與更新的事。' },
+      { id: 'spi_4', q: '你目前最深的人際連結是什麼？這段關係讓你成長，還是讓你停滯？', hint: '可以是家庭、友誼、伴侶、社群或師徒關係。誠實評估它的品質。' }
+    ]
+  },
+  {
+    id: 'vocation', icon: '🚀', label: '職志象限',
+    desc: '你的事業發展、價值創造與人生使命',
+    color: '#3b82f6',
+    questions: [
+      { id: 'voc_1', q: '你的工作對你來說是你「做」的事、你「擁有」的職位，還是你「是」的一部分？', hint: '你的工作身份與你的自我認同是分開的，還是緊密交織？' },
+      { id: 'voc_2', q: '你如何衡量職業上的成功——薪酬、影響力、成就感，還是某種更大的使命？', hint: '這個標準是你真心認同的，還是社會期待灌輸給你的？' },
+      { id: 'voc_3', q: '如果金錢和社會地位完全無關，你會把時間花在什麼上面？', hint: '這個答案是否與你目前的實際生活有很大的落差？' },
+      { id: 'voc_4', q: '你目前的工作與你真正想要創造的影響之間有多大距離？是什麼在阻止你縮短這個距離？', hint: '是恐懼、資源不足、還是你還不確定自己真正想要什麼？' }
+    ]
+  },
+  {
+    id: 'lifestyle', icon: '🌍', label: '生活整合',
+    desc: '四個象限如何在你的日常生活中互動',
+    color: '#ec4899',
+    questions: [
+      { id: 'life_1', q: '你的生活中，哪個象限目前佔用了你最多的時間和精力？這是你主動選擇的，還是被動形成的？', hint: '心智、身體、靈性、職志——哪一個主導了你的每一天？' },
+      { id: 'life_2', q: '你現在最著迷於什麼？有沒有讓你廢寢忘食、無法停止思考或探索的主題？', hint: '這種「著迷狀態（Channel）」可能是你發展加速的重要信號。' },
+      { id: 'life_3', q: '你生活中目前最核心的問題是什麼？如果解決了它，其他領域會有什麼連鎖改變？', hint: '試著找到根本原因而非表面症狀。例如財務問題背後可能是使命不清晰。' }
+    ],
+    extra: [
+      { id: 'basic_name', label: '你的名字（選填）', type: 'text', placeholder: '匿名亦可' },
+      { id: 'basic_age',  label: '年齡範圍', type: 'select', options: ['18–24 歲','25–34 歲','35–44 歲','45–54 歲','55 歲以上'] },
+      { id: 'basic_lang', label: '報告語言', type: 'select', options: ['繁體中文','简体中文','English'] }
+    ]
+  }
+];
+
+const TOTAL_QUESTIONS = STEPS.reduce((a, s) => a + s.questions.length, 0);
+
+// ──────────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────────
+let state = {
+  step: 0,
+  answers: {},
+  settings: { modelIdx: 0, keyOR: '', keyGoogle: '' },
+  reportMd: '',
+  prevScreen: 'screenReport'
+};
+
+// ──────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────
+(function init() {
+  try {
+    const saved = localStorage.getItem('h3_settings');
+    if (saved) state.settings = { ...state.settings, ...JSON.parse(saved) };
+  } catch(_) {}
+  renderModelList();
+  updateApiStatus();
+})();
+
+// ──────────────────────────────────────────────
+// SETTINGS
+// ──────────────────────────────────────────────
+function renderModelList() {
+  const list = document.getElementById('modelList');
+  list.innerHTML = MODELS.map((m, i) => `
+    <label class="model-opt ${i === state.settings.modelIdx ? 'sel' : ''}" onclick="selectModel(${i})">
+      <input type="radio" name="mdl" value="${i}" ${i === state.settings.modelIdx ? 'checked' : ''}>
+      <div class="radio-dot"></div>
+      <div class="model-info">
+        <div class="model-nm">${m.icon} ${m.name}</div>
+        <div class="model-sid">${m.id}</div>
+      </div>
+      <span class="model-tag ${m.tagClass}">${m.tag}</span>
+    </label>
+  `).join('');
+}
+
+function selectModel(idx) {
+  // Save current key before switching
+  syncKeyFromInput();
+  state.settings.modelIdx = idx;
+  document.querySelectorAll('.model-opt').forEach((el, i) => el.classList.toggle('sel', i === idx));
+  updateKeyFields();
+}
+
+function syncKeyFromInput() {
+  const val = document.getElementById('keyInput').value.trim();
+  const m = MODELS[state.settings.modelIdx];
+  if (m.provider === 'google') state.settings.keyGoogle = val;
+  else state.settings.keyOR = val;
+}
+
+function updateKeyFields() {
+  const m = MODELS[state.settings.modelIdx];
+  document.getElementById('keyLabel').textContent = m.keyLabel;
+  document.getElementById('keyInput').placeholder = m.placeholder;
+  document.getElementById('keyHint').innerHTML = m.keyHint;
+  const key = m.provider === 'google' ? state.settings.keyGoogle : state.settings.keyOR;
+  document.getElementById('keyInput').value = key || '';
+}
+
+function openSettings() {
+  updateKeyFields();
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
+function overlayClick(e) { if (e.target === document.getElementById('settingsOverlay')) closeSettings(); }
+function toggleKey() {
+  const inp = document.getElementById('keyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function saveSettings() {
+  syncKeyFromInput();
+  try { localStorage.setItem('h3_settings', JSON.stringify(state.settings)); } catch(_) {}
+  updateApiStatus();
+  closeSettings();
+  showToast('設定已儲存 ✓', 'success');
+}
+
+function updateApiStatus() {
+  const m = MODELS[state.settings.modelIdx];
+  const key = m.provider === 'google' ? state.settings.keyGoogle : state.settings.keyOR;
+  const active = key && key.length > 10;
+  document.getElementById('apiDot').className = 'api-dot ' + (active ? 'on' : 'off');
+  document.getElementById('apiStatusTxt').textContent = active ? m.icon + ' ' + m.name : '未設定 AI';
+}
+
+function hasApiKey() {
+  const m = MODELS[state.settings.modelIdx];
+  const key = m.provider === 'google' ? state.settings.keyGoogle : state.settings.keyOR;
+  return key && key.length > 10;
+}
+
+// ──────────────────────────────────────────────
+// QUIZ
+// ──────────────────────────────────────────────
+function startQuiz() {
+  state.step = 0;
+  state.answers = {};
+  state.reportMd = '';
+  showScreen('screenQuiz');
+  renderStep();
+}
+
+function renderStep() {
+  const s = STEPS[state.step];
+  const doneQ = STEPS.slice(0, state.step).reduce((a, x) => a + x.questions.length, 0);
+
+  // Progress
+  document.getElementById('progLabel').textContent = `${s.icon} ${s.label}`;
+  document.getElementById('progCount').textContent = `${doneQ} / ${TOTAL_QUESTIONS}`;
+  document.getElementById('progFill').style.width = (doneQ / TOTAL_QUESTIONS * 100) + '%';
+
+  // Tabs
+  document.getElementById('stepTabs').innerHTML = STEPS.map((t, i) => {
+    let cls = 'step-tab';
+    if (i < state.step) cls += ' done';
+    else if (i === state.step) cls += ' active';
+    return `<div class="${cls}">${t.icon} ${t.label}</div>`;
+  }).join('');
+
+  // Buttons
+  document.getElementById('btnBack').style.display = state.step > 0 ? '' : 'none';
+  const isLast = state.step === STEPS.length - 1;
+  document.getElementById('btnNext').textContent = isLast ? '提交並分析 →' : '繼續 →';
+
+  // Questions
+  let html = `<div class="section-card">
+    <div class="section-hd">
+      <div class="section-stripe" style="background:${s.color}"></div>
+      <div><h2>${s.icon} ${s.label}</h2><p>${s.desc}</p></div>
+    </div>`;
+
+  s.questions.forEach(q => {
+    const val = (state.answers[q.id] || '').replace(/"/g, '&quot;');
+    html += `<div class="q-item">
+      <label class="q-label">${q.q}</label>
+      ${q.hint ? `<p class="q-hint">${q.hint}</p>` : ''}
+      <textarea id="qa_${q.id}" placeholder="分享你真實的想法，越具體越好……" rows="4">${val}</textarea>
+    </div>`;
+  });
+
+  // Extra fields (lifestyle step)
+  if (s.extra) {
+    html += `<hr class="divider">
+      <p style="font-size:0.8125rem;font-weight:600;color:var(--text-muted);margin-bottom:1rem;">基本資料（選填）</p>
+      <div class="extra-grid">`;
+    s.extra.forEach(f => {
+      const val = state.answers[f.id] || '';
+      if (f.type === 'select') {
+        html += `<div class="fg"><label>${f.label}</label><select id="qa_${f.id}">
+          ${f.options.map(o => `<option ${val === o ? 'selected' : ''}>${o}</option>`).join('')}
+        </select></div>`;
+      } else {
+        html += `<div class="fg"><label>${f.label}</label>
+          <input type="text" id="qa_${f.id}" placeholder="${f.placeholder || ''}" value="${val}"></div>`;
+      }
+    });
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  document.getElementById('quizContent').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function collectAnswers() {
+  const s = STEPS[state.step];
+  s.questions.forEach(q => {
+    const el = document.getElementById('qa_' + q.id);
+    if (el) state.answers[q.id] = el.value.trim();
+  });
+  if (s.extra) {
+    s.extra.forEach(f => {
+      const el = document.getElementById('qa_' + f.id);
+      if (el) state.answers[f.id] = el.value;
+    });
+  }
+}
+
+function nextStep() {
+  collectAnswers();
+  if (state.step === STEPS.length - 1) { submitQuiz(); return; }
+  state.step++;
+  renderStep();
+}
+
+function prevStep() {
+  collectAnswers();
+  state.step--;
+  renderStep();
+}
+
+function submitQuiz() {
+  if (hasApiKey()) {
+    showScreen('screenAnalysis');
+    runAnalysis();
+  } else {
+    state.prevScreen = 'screenQuiz';
+    showScreen('screenExport');
+    renderExport();
+  }
+}
+
+// ──────────────────────────────────────────────
+// PROMPT BUILDING
+// ──────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are a direct, insightful development assessor specializing in the HUMAN 3.0 model. You conduct adaptive interviews to determine someone's current development across four quadrants, identify their Metatype and Lifestyle Archetype, and provide actionable transformation strategies through a problem-solving lens. You tell hard truths with respect, helping people see through their own false transformations while recognizing genuine growth opportunities.
+
+## HUMAN 3.0 Framework Summary
+
+**Four Quadrants:**
+- Mind (Upper Left): Internal reality, beliefs, worldview, metacognition
+- Body (Upper Right): Physical behavior, health, energy, appearance
+- Spirit (Lower Left): Relationships, meaning, community, transcendence
+- Vocation (Lower Right): Career, value creation, systems, legacy
+
+**Three Levels:**
+- Level 1.0 Conformist: External authority, black-white thinking, script-based living
+- Level 2.0 Individualist: Self-directed, status-seeking, contrarian, reactive rebellion
+- Level 3.0 Synthesist: Integrative, creates new games, programmer-level reality awareness
+
+**Three Phases per Level:** x.1 Dissonance → x.2 Uncertainty → x.3 Discovery
+
+**Traits:** Knowledge (theory), Experience (practice), Skill (mastery)
+
+**Lifestyle Archetypes:** Workaholic, Seeker, Optimizer, Drifter, Specialist, Integrated
+
+**Glitches (High-Risk Accelerants):** Psychedelics, PEDs, Financial Pressure, Extreme Life Changes, AI (meta-glitch crossing all quadrants)
+
+**Cross-Quadrant Unlock Sequences:**
+- Body unlocks Spirit, Mind unlocks Vocation, Vocation unlocks Body
+- Spirit unlocks Mind, Body unlocks Mind, Mind unlocks Spirit
+
+**Key Principles:**
+- Transcend and Include: higher levels integrate lower ones
+- Development is Non-Linear: people straddle multiple levels
+- Life is Problem-Solving: each solved problem reveals the next layer`;
+
+function buildUserPrompt() {
+  const lang = state.answers['basic_lang'] || '繁體中文';
+  const name = state.answers['basic_name'] ? `（${state.answers['basic_name']}）` : '';
+  const age = state.answers['basic_age'] || '未提供';
+
+  let p = `請用${lang}為以下用戶${name}（年齡：${age}）生成完整的 HUMAN 3.0 Development Assessment 報告。\n\n`;
+  p += `=== 問卷答案 ===\n\n`;
+
+  STEPS.forEach(s => {
+    p += `【${s.label}】\n`;
+    s.questions.forEach(q => {
+      const a = state.answers[q.id] || '（未作答）';
+      p += `Q: ${q.q}\nA: ${a}\n\n`;
+    });
+  });
+
+  p += `\n=== 輸出格式要求 ===\n\n請按以下結構輸出完整報告（使用 Markdown 格式）：\n\n`;
+  p += `1. **YOUR METATYPE** — 動態命名 + 2-3 句描述\n`;
+  p += `2. **YOUR LIFESTYLE ARCHETYPE** — 原型名稱 + 描述\n`;
+  p += `3. **QUADRANT BREAKDOWN** — 四個象限各自分析（層次、強項、弱點、生活影響、假性成長警示）\n`;
+  p += `4. **CROSS-QUADRANT DYNAMICS** — 主要阻礙、解鎖機會、隱藏模式、連鎖風險\n`;
+  p += `5. **YOUR CORE PROBLEM TO SOLVE** — 最核心的一個問題及根本原因\n`;
+  p += `6. **LIFESTYLE TRANSFORMATION STRATEGY** — 30天、90天、6-12個月計劃\n`;
+  p += `7. **GLITCH ASSESSMENT** — 根據發展層次給出加速器建議或警告\n`;
+  p += `8. **CRITICAL WARNINGS** — 關鍵風險警告\n`;
+  p += `9. **YOUR IMMEDIATE NEXT ACTION** — 24小時內可完成的具體行動\n`;
+  p += `10. **THE TRUTH ABOUT YOUR SITUATION** — 直接、誠實、有洞見的總結\n\n`;
+  p += `請確保報告詳細、直接、有洞見，並提供具體可行的建議。不要美化或迴避真相。`;
+
+  return p;
+}
+
+function buildFullExportPrompt() {
+  const sys = SYSTEM_PROMPT;
+  const usr = buildUserPrompt();
+  return `[SYSTEM INSTRUCTIONS]\n${sys}\n\n${'─'.repeat(60)}\n\n${usr}\n\n${'─'.repeat(60)}\n\n[CANVAS OUTPUT REQUEST]\n分析完成後，請使用 Canvas 功能輸出一個美觀的繁體中文 HTML 報告（深色主題，圖文並茂，包含完整評估內容），讓我可以下載並在瀏覽器中查看精美報告。`;
+}
+
+// ──────────────────────────────────────────────
+// ANALYSIS (API CALLS)
+// ──────────────────────────────────────────────
+async function runAnalysis() {
+  animateSteps();
+  const model = MODELS[state.settings.modelIdx];
+  const key = model.provider === 'google' ? state.settings.keyGoogle : state.settings.keyOR;
+  const userPrompt = buildUserPrompt();
+
+  try {
+    let result;
+    if (model.provider === 'google') {
+      result = await callGemini(key, model.id, userPrompt);
+    } else {
+      result = await callOpenRouter(key, model.id, userPrompt);
+    }
+    state.reportMd = result;
+    renderReport(result);
+    showScreen('screenReport');
+  } catch (err) {
+    showToast('分析失敗：' + err.message, 'error');
+    state.prevScreen = 'screenAnalysis';
+    showScreen('screenExport');
+    renderExport();
+  }
+}
+
+function animateSteps() {
+  const ids = ['as1','as2','as3','as4'];
+  ids.forEach((id, i) => {
+    setTimeout(() => {
+      if (i > 0) {
+        const prev = document.getElementById(ids[i-1]);
+        if (prev) { prev.className = 'a-icon done'; prev.textContent = '✓'; }
+      }
+      const el = document.getElementById(id);
+      if (el) { el.className = 'a-icon run'; el.textContent = '●'; }
+    }, i * 3500);
+  });
+}
+
+async function callOpenRouter(apiKey, modelId, userPrompt) {
+  const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      'HTTP-Referer': window.location.href,
+      'X-Title': 'Human 3.0 Assessment'
+    },
+    body: JSON.stringify({
+      model: modelId,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userPrompt }
+      ],
+      max_tokens: 6000,
+      temperature: 0.75
+    })
+  });
+  if (!resp.ok) {
+    const e = await resp.json().catch(() => ({}));
+    throw new Error(e.error?.message || `HTTP ${resp.status}`);
+  }
+  const data = await resp.json();
+  return data.choices?.[0]?.message?.content || '（無回應）';
+}
+
+async function callGemini(apiKey, modelId, userPrompt) {
+  const resp = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: SYSTEM_PROMPT + '\n\n' + userPrompt }] }],
+        generationConfig: { maxOutputTokens: 6000, temperature: 0.75 }
+      })
+    }
+  );
+  if (!resp.ok) {
+    const e = await resp.json().catch(() => ({}));
+    throw new Error(e.error?.message || `HTTP ${resp.status}`);
+  }
+  const data = await resp.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '（無回應）';
+}
+
+// ──────────────────────────────────────────────
+// REPORT RENDERING
+// ──────────────────────────────────────────────
+function renderReport(md) {
+  // Extract metatype
+  const mt = md.match(/METATYPE[：:]\s*\*{0,2}([^\n\*（(]+)/i);
+  const metatype = mt ? mt[1].trim() : 'Human 3.0 評估完成';
+  document.getElementById('rMetatype').textContent = metatype;
+
+  // Parse markdown
+  let html;
+  try { html = marked.parse(md); }
+  catch(_) { html = md.replace(/\n/g, '<br>'); }
+  document.getElementById('reportBody').innerHTML = html;
+}
+
+function downloadReport() {
+  if (!state.reportMd) { showToast('尚無報告內容', 'error'); return; }
+  let parsedHtml;
+  try { parsedHtml = marked.parse(state.reportMd); }
+  catch(_) { parsedHtml = state.reportMd.replace(/\n/g,'<br>'); }
+
+  const metatype = document.getElementById('rMetatype').textContent;
+  const dateStr = new Date().toLocaleDateString('zh-HK');
+
+  const full = `<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Human 3.0 Assessment – ${metatype}</title>
+<style>
+  :root{--bg:#09090b;--card:#18181b;--text:#fafafa;--muted:#a1a1aa;--border:#3f3f46;--primary:#a78bfa;--accent:#06b6d4;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:2rem 1.5rem 4rem;}
+  .wrap{max-width:800px;margin:0 auto;}
+  .hero{text-align:center;padding:2.5rem 2rem;background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(6,182,212,.08));border:1px solid rgba(124,58,237,.25);border-radius:1.25rem;margin-bottom:2rem;}
+  .eyebrow{display:inline-block;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:var(--primary);padding:.25rem .75rem;border-radius:2rem;font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.875rem;}
+  .hero h1{font-size:clamp(1.75rem,4vw,2.75rem);font-weight:900;background:linear-gradient(135deg,#fff,var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.5rem;}
+  .hero p{color:var(--muted);font-size:.9rem;}
+  .body{background:var(--card);border:1px solid var(--border);border-radius:1.25rem;padding:2rem;}
+  h1{font-size:1.5rem;font-weight:800;color:var(--primary);margin:1.5rem 0 .75rem;}
+  h2{font-size:1.1875rem;font-weight:700;color:var(--text);margin:1.75rem 0 .625rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);}
+  h3{font-size:1rem;font-weight:700;color:var(--accent);margin:1.25rem 0 .5rem;}
+  h4{font-size:.9375rem;font-weight:600;color:var(--muted);margin:1rem 0 .375rem;}
+  p{color:#d4d4d8;margin-bottom:.75rem;line-height:1.75;}
+  ul,ol{padding-left:1.5rem;color:#d4d4d8;margin-bottom:.75rem;}
+  li{margin-bottom:.375rem;line-height:1.65;}
+  strong{color:var(--text);}
+  blockquote{border-left:3px solid #7c3aed;padding-left:1rem;color:var(--muted);margin:1rem 0;font-style:italic;}
+  code{background:#27272a;padding:.15em .4em;border-radius:.3rem;font-size:.875em;color:var(--accent);}
+  hr{border:none;border-top:1px solid var(--border);margin:1.5rem 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Human 3.0 Development Assessment</div>
+    <h1>${metatype}</h1>
+    <p>${dateStr}</p>
+  </div>
+  <div class="body">${parsedHtml}</div>
+</div>
+</body>
+</html>`;
+
+  const blob = new Blob([full], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `human3-report-${Date.now()}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('報告已下載 ✓', 'success');
+}
+
+// ──────────────────────────────────────────────
+// EXPORT
+// ──────────────────────────────────────────────
+function showExport() {
+  state.prevScreen = 'screenReport';
+  renderExport();
+  showScreen('screenExport');
+}
+
+function renderExport() {
+  document.getElementById('promptBox').textContent = buildFullExportPrompt();
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(document.getElementById('promptBox').textContent)
+    .then(() => showToast('Prompt 已複製到剪貼板 ✓', 'success'))
+    .catch(() => showToast('複製失敗，請手動選取', 'error'));
+}
+
+function goBackFromExport() {
+  showScreen(state.prevScreen === 'screenReport' && state.reportMd ? 'screenReport' : 'screenQuiz');
+}
+
+// ──────────────────────────────────────────────
+// NAVIGATION
+// ──────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function resetAll() {
+  if (!confirm('確定要重新開始？所有答案將被清除。')) return;
+  state.answers = {};
+  state.reportMd = '';
+  state.step = 0;
+  showScreen('screenWelcome');
+}
+
+// ──────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
